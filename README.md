@@ -17,30 +17,21 @@ This Terraform configuration deploys an Amazon EKS cluster with Karpenter for au
    cd eks-karpenter-terraform
    ```
 
-2. Update the `backend.tf` file with your S3 bucket credentials:
+2. Update the `backend.tf` file with your S3 bucket name and desired key.
 
+3. Create a `terraform.tfvars` file with your specific values:
    ```hcl
-           terraform {
-             backend "s3" {
-               bucket         = "s3_bucket_name"
-               key            = "your-prefer-key-name"
-               region         = "your-region"
-               encrypt        = true
-               dynamodb_table = "db_table_name"    
-             }
-           }
+   region             = "us-west-2"
+   vpc_id             = "vpc-xxxxxxxxxxxxxxxxx"
+   cluster_name       = "my-eks-cluster"
+   state_bucket_name  = "your-terraform-state-bucket"
+   db_username        = "your_db_username"
+   db_password        = "your_db_password"
    ```
-3. Update `variable.tf` file with your vpc_id:
+
+4. Initialize Terraform with the S3 backend:
    ```
-     variable "vpc_id" {
-     description = "ID of the existing VPC"
-     type        = string
-     default = "vpc-23xxxxxxxxxxx"
-}
-   ```
-4. Initialize Terraform:
-   ```
-   terraform init
+   terraform init -backend-config="bucket=your-terraform-state-bucket" -backend-config="key=eks-cluster/terraform.tfstate" -backend-config="region=us-west-2"
    ```
 
 5. Apply the Terraform configuration:
@@ -124,3 +115,4 @@ kubectl apply -f arm64-deployment.yaml
 ```
 
 Karpenter will automatically provision the appropriate instance types based on the node selectors in your deployments.
+
